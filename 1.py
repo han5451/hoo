@@ -1,6 +1,6 @@
 import streamlit as st
-from streamlit_autorefresh import st_autorefresh
 import random
+import time
 
 st.title("Streamlit 테트리스 - 가로 15, 세로 10")
 
@@ -31,6 +31,8 @@ if "current_pos" not in st.session_state:
     st.session_state.current_pos = [WIDTH//2 - 1, 0]
 if "score" not in st.session_state:
     st.session_state.score = 0
+if "last_time" not in st.session_state:
+    st.session_state.last_time = time.time()
 
 def new_block():
     shape_key = random.choice(list(TETRIS_SHAPES.keys()))
@@ -95,8 +97,6 @@ def draw_grid():
                 row_str += "⬜"
         st.write(row_str)
 
-count = st_autorefresh(interval=1000, limit=None, key="auto_refresh")
-
 if st.session_state.current_shape is None:
     new_block()
 
@@ -109,10 +109,20 @@ if left_btn and can_move(-1, 0):
 elif right_btn and can_move(1, 0):
     st.session_state.current_pos[0] += 1
 
-if can_move(0, 1):
-    st.session_state.current_pos[1] += 1
-else:
-    fix_block()
+# 1초마다 자동으로 블록이 아래로 떨어지게 하기
+current_time = time.time()
+if current_time - st.session_state.last_time > 1:
+    st.session_state.last_time = current_time
+    if can_move(0, 1):
+        st.session_state.current_pos[1] += 1
+    else:
+        fix_block()
+    st.experimental_rerun()  # 페이지 다시 실행 (자동 새로고침)
 
 draw_grid()
 st.write(f"점수: {st.session_state.score}")
+
+
+streamlit-autorefresh
+
+
