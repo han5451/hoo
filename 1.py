@@ -2,11 +2,10 @@ import streamlit as st
 from streamlit_autorefresh import st_autorefresh
 import random
 
-st.title("Streamlit 테트리스(부산강서고)")
+st.title("Streamlit 테트리스 - 가로 15, 세로 10")
 
 WIDTH, HEIGHT = 15, 10
 
-# 테트리스 블록 7가지 모양 (4x4 기준)
 TETRIS_SHAPES = {
     "I": [[1,1,1,1]],
     "O": [[1,1],
@@ -23,14 +22,13 @@ TETRIS_SHAPES = {
           [1,1,1]],
 }
 
-# 세션 상태 초기화
 if "grid" not in st.session_state:
     st.session_state.grid = [[0]*WIDTH for _ in range(HEIGHT)]
 
 if "current_shape" not in st.session_state:
     st.session_state.current_shape = None
 if "current_pos" not in st.session_state:
-    st.session_state.current_pos = [WIDTH//2 - 1, 0]  # x, y 위치
+    st.session_state.current_pos = [WIDTH//2 - 1, 0]
 if "score" not in st.session_state:
     st.session_state.score = 0
 
@@ -82,7 +80,6 @@ def draw_grid():
     for y in range(HEIGHT):
         row_str = ""
         for x in range(WIDTH):
-            # 현재 블록 그리기
             draw_cell = False
             if shape:
                 rel_x = x - pos_x
@@ -98,14 +95,12 @@ def draw_grid():
                 row_str += "⬜"
         st.write(row_str)
 
-# 자동 새로고침
-count = st_autorefresh(interval=500, limit=None, key="auto_refresh")
 
-# 블록 없으면 새로 생성
+count = st_autorefresh(interval=1000, limit=None, key="auto_refresh")
+
 if st.session_state.current_shape is None:
     new_block()
 
-# 좌우 이동 버튼
 col1, col2 = st.columns(2)
 left_btn = col1.button("⬅️ 왼쪽")
 right_btn = col2.button("➡️ 오른쪽")
@@ -115,10 +110,14 @@ if left_btn and can_move(-1, 0):
 elif right_btn and can_move(1, 0):
     st.session_state.current_pos[0] += 1
 
-# 자동 낙하
 if can_move(0, 1):
     st.session_state.current_pos[1] += 1
 else:
+    fix_block()
+
+draw_grid()
+st.write(f"점수: {st.session_state.score}")
+
     fix_block()
 
 draw_grid()
