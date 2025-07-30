@@ -95,7 +95,6 @@ def draw_grid():
                 row_str += "⬜"
         st.write(row_str)
 
-
 count = st_autorefresh(interval=1000, limit=None, key="auto_refresh")
 
 if st.session_state.current_shape is None:
@@ -113,11 +112,6 @@ elif right_btn and can_move(1, 0):
 if can_move(0, 1):
     st.session_state.current_pos[1] += 1
 else:
-    fix_block()
-
-draw_grid()
-st.write(f"점수: {st.session_state.score}")
-
     fix_block()
 
 draw_grid()
